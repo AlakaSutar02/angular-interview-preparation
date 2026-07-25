@@ -1,7 +1,5 @@
 # Enterprise Angular Architecture & Component Design Guidelines
 
-An overview of my architectural philosophy, component design choices, and performance strategies for building scalable, enterprise-grade Angular applications.
-
 ---
 
 ## Why Angular?
@@ -95,3 +93,26 @@ Historically, `ngOnChanges` was required to react to property updates. Today, I 
 ### "When designing components, my priority is maintainability and performance. Structurally, I split them into Smart and Dumb components, leveraging Standalone architecture to keep bundles lean.
 
 ### Performance-wise, I strictly enforce OnPush change detection, shifting toward Signals for fine-grained updates rather than relying on Zone.js top-down cycles. Finally, I safeguard our application's memory footprint by ensuring clean unsubscriptions using modern primitives like `takeUntilDestroyed`."
+
+### Q1. Why Standalone Components? What are the trade-offs?
+
+**Decision:** We adopted Angular Standalone Components to eliminate the boilerplate and mental overhead of traditional feature `NgModule`s. Dependencies are declared directly inside each component's `imports` array.
+
+- **Benefits:**
+  - **Less Boilerplate:** No need to declare components across feature modules.
+  - **Direct Lazy Loading:** Routes can directly load standalone components or route arrays without module wrappers.
+  - **Explicit Dependencies:** Clear visibility into exactly what each component consumes, avoiding hidden coupling.
+  - **Easier Testing:** Simplified unit testing setup without importing entire feature modules.
+
+- **Trade-off:**
+  - Dependencies must be imported explicitly in every component that uses them (e.g., `CommonModule`, specific directives, or UI components).
+
+---
+
+### Q2. When are `NgModule`s still used?
+
+While all new features are built using Standalone Components, `NgModule`s are retained strictly for specific global concerns:
+
+1. **`CoreModule`:** Configures application-wide singleton services, global HTTP interceptors, and root NgRx store registration.
+2. **`SharedModule`:** Aggregates and re-exports common legacy directives/pipes and third-party UI libraries (e.g., Angular Material) that have not been fully migrated to standalone exports.
+3. **Legacy Third-Party Libraries:** Interfacing with external npm packages that still require module import configuration.

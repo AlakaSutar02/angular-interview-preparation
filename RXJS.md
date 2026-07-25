@@ -38,3 +38,76 @@ Best Used For: "HTTP POST or PUT requests where sequence matters. For instance, 
    How it works: "This operator doesn't cancel anything, and it doesn't wait around either. The moment a value arrives, it fires off the inner observable immediately. Requests 'a', 'b', and 'c' will all run concurrently in parallel, and their responses will be handled whenever they happen to finish."
 
 Best Used For: "Independent operations like HTTP DELETE requests, or processing a batch download where the order of completion doesn't matter, and you just want everything executed as fast as possible."
+
+## 1. What is the difference between an Observable and a Subject?
+
+_The absolute classic baseline question._
+
+- **Observable:** It is **unicast**. Every time a consumer calls `.subscribe()`, it triggers an entirely independent execution of the data producer. Think of it like Netflix: every user hits play and watches their own stream from the beginning.
+- **Subject:** It is **multicast**. It acts as both an Observable and an Observer. It maintains a registry of multiple listeners. When the Subject emits a value, all listeners receive the exact same value at the same time. Think of it like a live TV broadcast or a radio station.
+
+---
+
+## 2. Explain the differences between `switchMap`, `mergeMap`, `concatMap`, and `exhaustMap`.
+
+_This tests your knowledge of flattening operators, which is crucial for handling race conditions in APIs._
+
+Imagine a user is clicking a button repeatedly to load data:
+
+- **`switchMap` (The Switch/Cancel):** Cancels the current in-flight HTTP request if a new one comes in. Only the latest request completes.
+- _Best for:_ Search typeaheads or page sorting.
+
+- **`mergeMap` (The Free-for-All):** Launches requests concurrently as fast as they come in. They can finish in any order.
+- _Best for:_ Deleting multiple items from a list simultaneously where order doesn't matter.
+
+- **`concatMap` (The Queue):** Blocks and queues up incoming requests. It waits for the first request to fully complete before starting the next one.
+- _Best for:_ Form submissions or sequential database saves where chronological order is strict.
+
+- **`exhaustMap` (The Doormat):** Ignores all new incoming requests completely until the current active request finishes.
+- _Best for:_ Login buttons or submit buttons to prevent double-click accidental spamming.
+
+---
+
+## 3. How do you prevent memory leaks in Angular when using RxJS?
+
+_Show the interviewer you write production-grade, safe code._
+
+> "To prevent memory leaks, we must unsubscribe from long-lived asynchronous observables when components are destroyed. I use three primary approaches depending on the context:"
+
+1. **The `async` Pipe:** Whenever possible, let the Angular template handle it. The `async` pipe automatically unsubscribes when the component leaves the DOM.
+
+2. **`takeUntilDestroyed()` (Modern Angular):** Introduced in modern Angular via `@angular/core/rxjs-interop`. If used inside the constructor context, Angular injects the `DestroyRef` and handles the cleanup lifecycle natively without needing boilerplate code.
+
+   ```
+   typescript
+   private dataService = inject(DataService);
+
+   constructor() {
+   this.dataService.getStream$()
+      .pipe(takeUntilDestroyed())
+      .subscribe(data => handle(data));
+   }
+   ```
+
+```
+
+3. **Manual `takeUntil()`:** For older components or outside the constructor, create a private `DestroyRef` or a Subject and complete it in `ngOnDestroy`.
+
+---
+
+## 4. What is the difference between `forkJoin`, `combineLatest`, and `zip`?
+*Tests your ability to orchestrate multiple parallel HTTP streams or state sources.*
+
+* **`forkJoin`:** Acts like JavaScript's `Promise.all()`. It waits for **all** source Observables to completely finish (complete), then emits the final values of each as an array. If one stream fails, the whole thing fails.
+  * *Best for:* Loading static dropdown configurations on page initialization.
+* **`combineLatest`:** Waits for every source stream to emit at least *once*, then emits a combined array. From that point forward, **any single emission** from any source triggers a fresh combined output using the most recent cached values.
+  * *Best for:* Combining dynamic filters (e.g., search text + checkbox array + page index).
+* **`zip`:** Pairs emissions dynamically strictly by index (the 1st emission of stream A matches with the 1st emission of stream B, the 2nd with the 2nd, etc.). It moves in strict lockstep.
+
+## 5. Senior Pro-Tip Answer: "When do you choose Signals over RxJS?"
+how you balance modern Angular Signals with RxJS:
+
+> *"Signals do not replace RxJS; they work together. I use a **hybrid architectural model**. I keep **RxJS in the Service layer** because it excels at asynchronous operations, HTTP pipelines, debouncing, error handling, and web sockets. Then, I convert those streams using `toSignal()` to expose them to the component. In the **Component layer**, I use Signals for synchronous UI state management because they give us clean templates without async pipes and trigger surgical, fine-grained DOM rendering."*
+
+
+```

@@ -1,4 +1,4 @@
-Here is the principal lead-level interview script, structured specifically to address each question with deep technical clarity, modern Angular 17–19 paradigms, and JavaScript internal mechanics.
+﻿Here is the principal lead-level interview script, structured specifically to address each question with deep technical clarity, modern Angular 17â€“19 paradigms, and JavaScript internal mechanics.
 
 ---
 
@@ -53,7 +53,7 @@ Here is the principal lead-level interview script, structured specifically to ad
 >
 > `main.ts` executed `platformBrowserDynamic().bootstrapModule(AppModule)`. `AppModule` processed its `@NgModule.bootstrap` array, registered global providers, and loaded the root `AppComponent`.
 >
-> #### Modern Standalone Bootstrap (Angular 17–19):\*\*
+> #### Modern Standalone Bootstrap (Angular 17â€“19):\*\*
 >
 > Since there is no `AppModule`, bootstrapping starts directly with `bootstrapApplication()` passing a **Standalone Root Component** and a configuration object:
 >
@@ -190,11 +190,11 @@ export class SettingsComponent {
     this.theme.update(current => current === 'light' ? 'dark' : 'light');
   }
 }
-```"
+```
 
----
 
-### **7) Which RxJS Operators Have You Used?**
+
+### Q. Which RxJS Operators Have You Used?
 
 > "In production architectures, I categorize RxJS operators by their responsibilities:
 >
@@ -205,7 +205,7 @@ export class SettingsComponent {
 
 ---
 
-### **8) Difference Between `concatMap` and `mergeMap`**
+### Q. Difference Between `concatMap` and `mergeMap`
 
 | Operator | Execution Order | Concurrency | Primary Production Use Case |
 | :--- | :--- | :--- | :--- |
@@ -214,7 +214,7 @@ export class SettingsComponent {
 
 ---
 
-### **9) Difference Between Pure and Impure Pipes**
+### Q. Difference Between Pure and Impure Pipes
 
 > * **Pure Pipe (Default: `pure: true`):** Angular executes a pure pipe **ONLY when it detects a change in input value references** (primitive value changes or new object memory references). Highly performant.
 > * **Impure Pipe (`pure: false`):** Angular executes an impure pipe on **EVERY single Change Detection run**, regardless of whether inputs changed.
@@ -222,7 +222,7 @@ export class SettingsComponent {
 
 ---
 
-### **10) Which Will Execute First: `setTimeout` or `Promise`?**
+### Q. Which Will Execute First: `setTimeout` or `Promise`?
 
 > **"`Promise` callback will execute first.**
 >
@@ -242,7 +242,7 @@ Promise.resolve().then(() => console.log('Microtask: Promise'));
 
 ---
 
-### **11) What is the Event Loop?**
+### Q. What is the Event Loop?
 
 > **"The Event Loop is JavaScript's single-threaded concurrency runtime model.**
 >
@@ -253,7 +253,7 @@ Promise.resolve().then(() => console.log('Microtask: Promise'));
 
 ---
 
-### **12) What is a Closure?**
+### Q. What is a Closure?
 
 > **"A Closure is the combination of a function bundled together with references to its surrounding lexical environment.**
 >

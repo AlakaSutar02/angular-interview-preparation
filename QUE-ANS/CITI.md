@@ -1,4 +1,4 @@
-Q. How is your application managing state and sharing data between components?
+﻿## Q. How is your application managing state and sharing data between components?
 
 "In our application, we follow a Hybrid State Management Strategy designed for low complexity, high maintainability, and optimal runtime performance."
 
@@ -11,7 +11,7 @@ Parent-Child Communication: Data flows down via Signal Inputs (input.required())
 
 Cross-Component / Sibling Communication: Siblings never communicate directly. Instead, they interact via a shared Service or the feature's SignalStore. Component A dispatches an action/method to the store, and Component B automatically updates because it reads a computed() signal derived from that store."\*
 
-Q. How are you securing your Angular application?
+## Q. How are you securing your Angular application?
 "When it comes to securing our Angular apps, I focus on a few practical layers that actually matter in production:
 
     1. Handling Tokens & CSRF Realistically
@@ -22,7 +22,7 @@ Q. How are you securing your Angular application?
 
     We enforce a strict rule: No direct DOM manipulation using ElementRef.nativeElement.
 
-    If we must render raw HTML from a CMS or rich-text editor using [innerHTML], we run it through DOMPurify to sanitize it first, rather than just blindly bypassing Angular’s sanitizer with bypassSecurityTrustHtml.
+    If we must render raw HTML from a CMS or rich-text editor using [innerHTML], we run it through DOMPurify to sanitize it first, rather than just blindly bypassing Angularâ€™s sanitizer with bypassSecurityTrustHtml.
 
     3. Enforcing Access Control at the Route Level
     We use functional Route Guards (CanActivateFn) to check roles before a user lands on a page. More importantly, because we lazy-load our feature modules, these guards prevent unauthorized users from even downloading the JavaScript code for admin or internal pages they shouldn't see.
@@ -30,7 +30,7 @@ Q. How are you securing your Angular application?
     4. Protecting the Environment (CSP & CI/CD)
     On the server/Nginx side, we set a strong Content Security Policy (CSP) header to restrict where scripts can be executed from. And in our CI/CD pipeline, we run tools like npm audit or Snyk to catch vulnerable npm packages before code gets merged to production."
 
-Q. Where do you store authentication tokens? sub question Session Storage vs Local Storage and Can tokens be stored in a Service using RxJS Observables?
+## Q. Where do you store authentication tokens? sub question Session Storage vs Local Storage and Can tokens be stored in a Service using RxJS Observables?
 
 For token storage, we aim for HttpOnly cookies for refresh tokens and keep short-lived access tokens in-memory inside an AuthService using RxJS BehaviorSubject or Signals. Between local storage and session storage, sessionStorage is safer for tokens because it automatically clears when the tab closes and stays isolated per tab.
 Here is the concise, ultra-focused version:
@@ -69,7 +69,7 @@ export class AuthService {
 
 - **How it works:** On login, push the token into the `BehaviorSubject`. The `HttpInterceptor` reads `authService.getToken()` synchronously and attaches it to `Authorization: Bearer <token>` headers without ever exposing it to `localStorage`.
 
-Q. Write a function to fetch data from an API (JsonPlaceholder API was used). How do you design API calling from the UI? When do you use the Async Pipe? When should you unsubscribe manually?
+## Q. Write a function to fetch data from an API (JsonPlaceholder API was used). How do you design API calling from the UI? When do you use the Async Pipe? When should you unsubscribe manually?
 
 ---
 
@@ -141,7 +141,7 @@ export class UserListComponent {
 We follow a **3-Layer Architecture**:
 
 ```
-UI Component (Presenter) ──> Service / Facade (Orchestrator) ──> HttpClient (Data Layer)
+UI Component (Presenter) â”€â”€> Service / Facade (Orchestrator) â”€â”€> HttpClient (Data Layer)
 
 ```
 
@@ -211,7 +211,7 @@ export class UserComponent implements OnInit, OnDestroy {
 1. **HttpClient requests:** Angular's `HttpClient` automatically completes the Observable after emitting the single response/error payload.
 2. **`AsyncPipe` / `toSignal()`:** Angular handles the teardown internally when the view is destroyed.
 
-Q. Explain different types of Signals and the use case of computed().
+## Q. Explain different types of Signals and the use case of computed().
 Here is a clear breakdown of the **3 core types of Signals** in Angular and how/when to use `computed()`.
 
 ---
@@ -221,16 +221,16 @@ Here is a clear breakdown of the **3 core types of Signals** in Angular and how/
 Angular provides three primary signal primitives to manage reactivity:
 
 ```
-                  ┌──────────────────────┐
-                  │   Writable Signal    │  (Source of Truth / Mutatable)
-                  └──────────┬───────────┘
-                             │
-            ┌────────────────┴────────────────┐
-            ▼                                 ▼
-┌──────────────────────┐          ┌──────────────────────┐
-│   Computed Signal    │          │        Effect        │
-│ (Derived State / Read)│          │ (Side Effect/Syncing)│
-└──────────────────────┘          └──────────────────────┘
+                  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                  â”‚   Writable Signal    â”‚  (Source of Truth / Mutatable)
+                  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                             â”‚
+            â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+            â–¼                                 â–¼
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚   Computed Signal    â”‚          â”‚        Effect        â”‚
+â”‚ (Derived State / Read)â”‚          â”‚ (Side Effect/Syncing)â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜          â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 
 ```
 
@@ -367,9 +367,9 @@ export class ProductListComponent {
 
 > _"Angular provides three Signal types: **Writable Signals** for managing raw mutable state, **Computed Signals** for derived state, and **Effects** for side-effects. We use `computed()` whenever we need to transform or filter existing state. It provides **automatic dependency tracking, lazy evaluation, and built-in memoization**."_
 
-Q. How would you track every route change to monitor user navigation?
+## Q. How would you track every route change to monitor user navigation?
 
-Here is the complete **Modern Angular (v16–v19+) code implementation** for a Navigation Tracker service. It uses **Standalone Services**, **Functional `inject()**`, **Signals**, and **`takeUntilDestroyed()`\*\*.
+Here is the complete **Modern Angular (v16â€“v19+) code implementation** for a Navigation Tracker service. It uses **Standalone Services**, **Functional `inject()**`, **Signals**, and **`takeUntilDestroyed()`\*\*.
 
 ---
 
@@ -475,7 +475,7 @@ export const appConfig: ApplicationConfig = {
 3. **`inject()`**: Uses modern dependency injection rather than constructor parameter lists.
 4. **`provideAppInitializer()`**: Replaces the deprecated `APP_INITIALIZER` injection token pattern.
 
-Q. Suppose a Reactive Form contains a dropdown that gets enabled/disabled from multiple events. A defect is reported where the dropdown behaves incorrectly. How would you debug which event is changing its state?
+## Q. Suppose a Reactive Form contains a dropdown that gets enabled/disabled from multiple events. A defect is reported where the dropdown behaves incorrectly. How would you debug which event is changing its state?
 Here is a direct, polished answer you can speak word-for-word in an interview:
 
 ---
@@ -499,12 +499,12 @@ Here is a direct, polished answer you can speak word-for-word in an interview:
 > **3. Refactor to a Single Source of Truth**
 > Once found, to permanently fix the root cause, I remove the scattered imperative `.enable()` and `.disable()` calls. Instead, I consolidate the logic into a single `computed()` signal or RxJS stream, using an Angular `effect()` to sync the control's enabled/disabled state in one centralized place."
 
-Q. Your UI development is complete, but backend APIs are still under development. API contracts are available. How will you test your application?
+## Q. Your UI development is complete, but backend APIs are still under development. API contracts are available. How will you test your application?
 (Expected: Mocking APIs)
 
 When backend APIs aren't ready but API contracts are defined, we unblock UI development and testing by mocking the API layer based on those schemas\
 
-Q. Your form has more than 50 fields. Will you keep the complete Reactive Form and template inside one component?
+## Q. Your form has more than 50 fields. Will you keep the complete Reactive Form and template inside one component?
 "No, absolutely not. Putting a 50+ field form inside a single component creates severe maintainability issues, huge template files, and potential performance bottlenecks during change detection.
 
 Instead, I break it down using a Modular Form Architecture:
@@ -524,7 +524,7 @@ Child Components (Dumb): Each child represents a section of the form. Instead of
 4. Performance Tuning
    For large forms, listening to global form.valueChanges can degrade performance. I isolate value changes to specific sub-controls and use ChangeDetectionStrategy.OnPush across all child form components."
 
-Q. How would you build a dynamic form using JSON configuration instead of hardcoding controls?
+## Q. How would you build a dynamic form using JSON configuration instead of hardcoding controls?
 
 ### **Interview Answer (Word-for-Word Script)**
 
@@ -535,7 +535,7 @@ Q. How would you build a dynamic form using JSON configuration instead of hardco
 > **2. Build a Dynamic Form Service Factory**
 > A dedicated service iterates over the JSON schema array and dynamically instantiates a `FormGroup` containing `FormControl`s with their corresponding Angular `Validators` (e.g., `required`, `email`, `pattern`).
 > **3. Render Using a Dynamic Host Component (`@switch` or `NgComponentOutlet`)**
-> A parent renderer loops through the schema using `@for`. Inside, it renders inputs dynamically—either using a native `@switch` on field types (`text`, `select`, `checkbox`) or via `ngComponentOutlet` if fields require custom complex widgets.
+> A parent renderer loops through the schema using `@for`. Inside, it renders inputs dynamicallyâ€”either using a native `@switch` on field types (`text`, `select`, `checkbox`) or via `ngComponentOutlet` if fields require custom complex widgets.
 > **4. Handle Conditional Logic & Dependencies**
 > For conditional fields (e.g., _'Show Field B only if Field A == Yes'_), we listen to `form.valueChanges` or use Angular **Signals / `computed()**`to dynamically calculate`hidden`or`disabled` states without polluting component templates."
 
@@ -672,7 +672,7 @@ export class DynamicFormComponent implements OnInit {
 2. **Performance with Large Schemas:** For large JSON configs (50+ fields), track form controls using track keys (`track field.key`) to avoid full re-rendering of the DOM tree when field values mutate.
 3. **Existing Open-Source Libraries:** Mention that in enterprise projects, you evaluate existing battle-tested libraries like **ngx-formly** before building a custom in-house engine.
 
-Q. Your application has a Stepper, and each step is implemented in a different Angular component. How would you share the complete form across all steps?
+## Q. Your application has a Stepper, and each step is implemented in a different Angular component. How would you share the complete form across all steps?
 
 "To share a form across multi-step components, I choose between two approaches depending on routing:
 
@@ -683,3 +683,4 @@ Q. Your application has a Stepper, and each step is implemented in a different A
    If steps live on distinct routes (/step-1, /step-2), ControlContainer can't bridge the components. Instead, we store the root FormGroup in a singleton FormStateService. Each routed component injects the service to read and update its specific form slice, preserving state across route navigations.
 
 In both cases, step navigation is gated by validating only the active step's sub-FormGroup before advancing."
+

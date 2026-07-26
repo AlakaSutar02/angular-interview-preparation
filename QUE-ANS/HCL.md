@@ -1,4 +1,4 @@
-## Q. ** You upgraded Angular from a lower version to a higher version. What steps did you follow? Did you follow any official documentation during the upgrade? Which documentation or migration guide did you use? **
+﻿## Q. ** You upgraded Angular from a lower version to a higher version. What steps did you follow? Did you follow any official documentation during the upgrade? Which documentation or migration guide did you use? **
 
 ### **Interview Answer (Word-for-Word Script)**
 
@@ -263,14 +263,14 @@ npm install https://internal-s3-bucket.mycompany.com/packages/my-library-1.0.0.t
 > **1. Nx Monorepo Architecture (Best for Internal Org Ecosystems)**
 > If all 10 applications live (or can live) inside an **Nx Monorepo**, we create an internal shared library (e.g., `@my-org/shared/logging`). Any app in the repository imports the logging service or HTTP interceptor directly. Updates are instant, version alignment is automatic, and atomic commits ensure zero breakages across all 10 apps.
 > **2. Enterprise NPM Package Architecture (Best for Multi-Repo / Polyrepo Setup)**
-> If the projects reside in separate Git repositories, we generate a standalone Angular library (`ng generate library logging`), publish it to our **private internal NPM registry** (like Azure Artifacts, JFrog Artifactory, or Nexus), and consume it as a standard dependency (`@my-org/logging`) in each app’s `package.json`.
+> If the projects reside in separate Git repositories, we generate a standalone Angular library (`ng generate library logging`), publish it to our **private internal NPM registry** (like Azure Artifacts, JFrog Artifactory, or Nexus), and consume it as a standard dependency (`@my-org/logging`) in each appâ€™s `package.json`.
 > **What the Shared Library Provides:**
 >
 > - **A Unified Angular Service (`LoggingService`):** Exposes standardized methods (`log()`, `error()`, `warn()`) with uniform metadata structures (app name, environment, user ID, timestamp, stack trace).
 > - **Automatic Error Catching:** Includes a built-in `ErrorHandler` implementation and an `HttpInterceptor` to automatically intercept and batch unhandled JS errors and 4xx/5xx network failures.
 > - **Configurable Providers:** Uses `provideLogging({ apiKey, endpoint, logLevel })` or `EnvironmentProviders` so individual apps can easily configure their own destination endpoints or log levels while sharing 100% of the underlying logic."
 
-## Q. ### **How does data flow in NgRx?**
+## Q. **How does data flow in NgRx?**
 
 **Answer:**
 
@@ -285,13 +285,13 @@ npm install https://internal-s3-bucket.mycompany.com/packages/my-library-1.0.0.t
 
 ---
 
-### ** Is NgRx the only option available for state management?**
+### **Is NgRx the only option available for state management?**
 
 **Answer:**
 
 > "No, NgRx Redux Store is far from the only option. Depending on complexity, we use:
 >
-> 1. **Angular Signals (`signal()`, `computed()`, `linkedSignal()`):** Built-in native state primitives—often replacing external libraries for small-to-medium apps.
+> 1. **Angular Signals (`signal()`, `computed()`, `linkedSignal()`):** Built-in native state primitivesâ€”often replacing external libraries for small-to-medium apps.
 > 2. **NgRx SignalStore / ComponentStore:** Lightweight, reactive state management built specifically around Angular Signals without the boilerplate of Redux actions and reducers.
 > 3. **RxJS BehaviorSubject Services:** Creating lightweight custom state services using RxJS observables (often called the _BehaviorSubject/Service-with-a-Subject_ pattern).
 > 4. **Elf / Akita:** Alternative RxJS-based reactive state management engines with less boilerplate."

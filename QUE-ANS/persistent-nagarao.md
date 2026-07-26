@@ -1,4 +1,4 @@
-What are the new features of Angular 21?
+Q. What are the new features of Angular 21?
 
     1. Experimental Signal Forms : Angular 21 introduces a new reactive form API  built on Signals.
     2. Zoneless Change Detection by Default : Zone.js is no longer included by default in new Angular projects. Reduces bundle sizes by ~30 KB and eliminates unnecessary change detection cycles.
@@ -6,7 +6,7 @@ What are the new features of Angular 21?
     4. Vitest as the Default Test Runner
     5. Angular MCP Server (AI Integration)
 
-What are Directives in Angular?
+Q. What are Directives in Angular?
 
     Directives are TypeScript classes annotated with @Directive() that attach custom behavior, appearance, or structural transformations to elements in the DOM.
     With modern Angular, directives are written as Standalone by default.
@@ -71,7 +71,7 @@ What are Directives in Angular?
 
     ```
 
-explain Lifecycle Hooks in Angular in modern angular.
+Q. explain Lifecycle Hooks in Angular in modern angular.
 
     ---
 
@@ -188,8 +188,7 @@ explain Lifecycle Hooks in Angular in modern angular.
 
     > *"In modern Angular, we are moving away from imperative class-level lifecycle hooks toward declarative reactive primitives. Instead of overriding `ngOnChanges` or `ngOnInit`, we use Signal inputs, `computed()` properties, and `effect()`. For DOM manipulation, instead of `ngAfterViewInit`, we use SSR-safe primitives like `afterNextRender()`. Finally, `DestroyRef` and `takeUntilDestroyed()` allow us to encapsulate lifecycle cleanup directly within composable functions or services, eliminating boilerplate and making our applications fully ready for Zoneless rendering."*
 
-Which RxJS operators have you used?
----
+Q. Which RxJS operators have you used?
 
     ## 1. Higher-Order Flattening Operators (Race Conditions & Concurrency)
 
@@ -372,27 +371,28 @@ Q. How to use RxJS in TypeScript if you want to handle errors and retry API up t
     ```
 
 Q. After subscribing, will you handle error or before subscribing
-Handling errors inside the pipeline with operators like catchError() (before subscribing) offers critical architectural advantages:
-catchError() allows you to intercept an error, perform logging, and return a fallback stream or safe default value (using of()). This prevents the observable stream from prematurely terminating or breaking downstream subscribers.
-In Modern Angular (v16–v21), the ultimate goal is to avoid manual .subscribe() calls completely:
-Service Layer: Build robust RxJS pipelines with pipe(retry(), catchError()).
-Component Layer: Convert the pipeline to a Signal using toSignal() or consume it via the async pipe.
-```
-@Component({ ... })
-export class UserListComponent {
-private userService = inject(UserService);
 
-    	  // No manual .subscribe() or subscription error handling needed in Component TS!
-    	  readonly users = toSignal(
-    		this.userService.getUsers().pipe(
-    		  catchError(err => {
-    			this.notificationService.showError('Failed to load users');
-    			return of([]); // Fallback to empty list
-    		  })
-    		),
-    		{ initialValue: [] }
-    	  );
-    	}
+    Handling errors inside the pipeline with operators like catchError() (before subscribing) offers critical architectural advantages:
+    catchError() allows you to intercept an error, perform logging, and return a fallback stream or safe default value (using of()). This prevents the observable stream from prematurely terminating or breaking downstream subscribers.
+    In Modern Angular (v16–v21), the ultimate goal is to avoid manual .subscribe() calls completely:
+    Service Layer: Build robust RxJS pipelines with pipe(retry(), catchError()).
+    Component Layer: Convert the pipeline to a Signal using toSignal() or consume it via the async pipe.
+    ```
+    @Component({ ... })
+    export class UserListComponent {
+    private userService = inject(UserService);
+
+            // No manual .subscribe() or subscription error handling needed in Component TS!
+            readonly users = toSignal(
+                this.userService.getUsers().pipe(
+                catchError(err => {
+                    this.notificationService.showError('Failed to load users');
+                    return of([]); // Fallback to empty list
+                })
+                ),
+                { initialValue: [] }
+            );
+            }
     ```
 
 Q. Explain complete flow — how response comes, subscribe works, and error handling happens.?
@@ -480,8 +480,6 @@ Q. Explain complete flow — how response comes, subscribe works, and error hand
     ---
 
     > *"For a standard GET request, defining `http.get().pipe(catchError())` builds a lazy pipeline that only fires when subscribed to. On a successful 200 OK, `HttpClient` passes data through `.next()` directly to the subscriber and then completes. On an HTTP error, `HttpClient` emits an error notification, which `catchError()` intercepts to log telemetry and emit a fallback value via `of()`. This converts the error into a valid `.next()` emission, keeping the UI stable without unhandled client-side exceptions."*
-
-Q.
 
     Instead of writing code inside the `.subscribe()` block, you chain RxJS operators within `.pipe()` to transform, filter, combine, or handle errors *before* data reaches the consumer.
 
@@ -603,20 +601,24 @@ Q.
     > *"We implement pre-subscription logic declaratively using RxJS operators inside `.pipe()`. We use `map` for DTO transformations, `tap` for side-effects like loaders or analytics, filtering operators to enforce business rules, and `catchError` with `retry` for error resilience. This keeps our service pipelines self-contained, testable, and clean—allowing us to expose streams safely to UI components via `toSignal()` without writing imperative code inside subscription blocks."*
 
 Q. Why do we use pipe before subscribing?
-.pipe() is used to declaratively assemble processing pipelines. It transforms, filters, and manages error recovery on the stream before data hits the consumer, keeping subscription callbacks clean and keeping transformation logic re-usable and testable.
+
+    .pipe() is used to declaratively assemble processing pipelines. It transforms, filters, and manages error recovery on the stream before data hits the consumer, keeping subscription callbacks clean and keeping transformation logic re-usable and testable.
 
 Q. Then why do we use map operator?
-map is used for synchronous data projection. It takes values emitted by the source observable, applies a transformation function, and emits the transformed result downstream before the consumer receives it
+
+    map is used for synchronous data projection. It takes values emitted by the source observable, applies a transformation function, and emits the transformed result downstream before the consumer receives it.
+
 Q. What does filter operator do?
-The filter operator acts as a conditional gatekeeper for streams. It evaluates every item emitted by the source Observable against a predicate function (a boolean check).
-If the condition evaluates to true, the item passes through to the next operator or subscriber.
-If the condition evaluates to false, the item is dropped/ignored completely—it will never reach downstream operators or the subscriber.
-Common Enterprise Use Cases:
-Preventing Null/Undefined Processing: Block null or undefined values from breaking downstream components.
 
-    Min-Length Search Triggers: In search inputs, ignore search terms that have fewer than 3 characters.
+    The filter operator acts as a conditional gatekeeper for streams. It evaluates every item emitted by the source Observable against a predicate function (a boolean check).
+    If the condition evaluates to true, the item passes through to the next operator or subscriber.
+    If the condition evaluates to false, the item is dropped/ignored completely—it will never reach downstream operators or the subscriber.
+    Common Enterprise Use Cases:
+    Preventing Null/Undefined Processing: Block null or undefined values from breaking downstream components.
 
-    Role/State Guards: Filter events based on specific status flags (e.g., only process orders where status === 'COMPLETED').
+        Min-Length Search Triggers: In search inputs, ignore search terms that have fewer than 3 characters.
+
+        Role/State Guards: Filter events based on specific status flags (e.g., only process orders where status === 'COMPLETED').
 
 Q. How will you implement lazy loading in Angular?
 Lazy loading splits application bundles into smaller, on-demand JavaScript chunks. Instead of serving a massive initial main.js bundle to the user, Angular downloads only the critical initial code, deferring remaining routes and heavy components until requested.
@@ -625,80 +627,83 @@ In modern Standalone Angular applications (Angular 15–21+), routes lazy-load s
 ```
 import { Routes } from '@angular/router';
 
-    	export const routes: Routes = [
-    	  // Standard Eager Loaded Route
-    	  { path: '', component: HomeComponent },
+            export const routes: Routes = [
+            // Standard Eager Loaded Route
+            { path: '', component: HomeComponent },
 
-    	  // Lazy Loaded Standalone Component (loadComponent)
-    	  {
-    		path: 'dashboard',
-    		loadComponent: () => import('./dashboard/dashboard.component')
-    		  .then(m => m.DashboardComponent)
-    	  },
+            // Lazy Loaded Standalone Component (loadComponent)
+            {
+                path: 'dashboard',
+                loadComponent: () => import('./dashboard/dashboard.component')
+                .then(m => m.DashboardComponent)
+            },
 
-    	  // Lazy Loaded Nested Route Tree (loadChildren for modern route files)
-    	  {
-    		path: 'admin',
-    		loadChildren: () => import('./admin/admin.routes')
-    		  .then(m => m.ADMIN_ROUTES)
-    	  }
-    	];
-    	```
+            // Lazy Loaded Nested Route Tree (loadChildren for modern route files)
+            {
+                path: 'admin',
+                loadChildren: () => import('./admin/admin.routes')
+                .then(m => m.ADMIN_ROUTES)
+            }
+            ];
+            ```
 
-Q. What are ways to optimize Angular application?
----
+    Q. What are ways to optimize Angular application?
 
-    ## 1. Runtime & Change Detection (CPU & Memory)
+        ---
 
-    ### A. Zoneless & Signal-Based Architecture
+        ## 1. Runtime & Change Detection (CPU & Memory)
 
-    * **Strategy:** Transition from `zone.js` global change detection to fine-grained **Signals** or `ChangeDetectionStrategy.OnPush`.
-    * **Impact:** Eliminates full component tree re-evaluations whenever an asynchronous event (DOM event, HTTP call, timer) fires.
-    * **Modern Best Practice:** In Angular 21, run applications Zoneless (`provideExperimentalZonelessChangeDetection()`) so change detection only triggers for components with explicit signal or input mutations.
+        ### A. Zoneless & Signal-Based Architecture
 
-    ### B. Template Loop Tracking (`@for` with `track`)
+        * **Strategy:** Transition from `zone.js` global change detection to fine-grained **Signals** or `ChangeDetectionStrategy.OnPush`.
+        * **Impact:** Eliminates full component tree re-evaluations whenever an asynchronous event (DOM event, HTTP call, timer) fires.
+        * **Modern Best Practice:** In Angular 21, run applications Zoneless (`provideExperimentalZonelessChangeDetection()`) so change detection only triggers for components with explicit signal or input mutations.
 
-    * **Strategy:** Use modern `@for (item of items; track item.id)` syntax instead of legacy `*ngFor` without `trackBy`.
-    * **Impact:** Prevents Angular from destroying and re-creating DOM nodes when array references change, updating only modified items.
+        ### B. Template Loop Tracking (`@for` with `track`)
 
-    ### C. Preventing Memory Leaks
+        * **Strategy:** Use modern `@for (item of items; track item.id)` syntax instead of legacy `*ngFor` without `trackBy`.
+        * **Impact:** Prevents Angular from destroying and re-creating DOM nodes when array references change, updating only modified items.
 
-    * **Strategy:** Clean up infinite RxJS subscriptions using `takeUntilDestroyed()`, `DestroyRef`, or by piping observables directly into template Signals via `toSignal()`.
+        ### C. Preventing Memory Leaks
 
-    ---
+        * **Strategy:** Clean up infinite RxJS subscriptions using `takeUntilDestroyed()`, `DestroyRef`, or by piping observables directly into template Signals via `toSignal()`.
 
-    ## 2. Bundle Size & Loading Strategy (Initial Load & Web Vitals)
+        ---
 
-    ### A. Dynamic Deferral (`@defer`) & Route-Based Lazy Loading
+        ## 2. Bundle Size & Loading Strategy (Initial Load & Web Vitals)
 
-    * **Strategy:** Lazy load routes using `loadComponent` and heavy template sections (charts, code editors, complex dialogs) using `@defer (on viewport)` or `@defer (on interaction)`.
-    * **Impact:** Drastically reduces initial JavaScript bundle size, improving **Largest Contentful Paint (LCP)** and **Total Blocking Time (TBT)**.
+        ### A. Dynamic Deferral (`@defer`) & Route-Based Lazy Loading
 
-    ### B. Tree-Shakable Services & Standalone Components
+        * **Strategy:** Lazy load routes using `loadComponent` and heavy template sections (charts, code editors, complex dialogs) using `@defer (on viewport)` or `@defer (on interaction)`.
+        * **Impact:** Drastically reduces initial JavaScript bundle size, improving **Largest Contentful Paint (LCP)** and **Total Blocking Time (TBT)**.
 
-    * **Strategy:** Use `standalone: true` components and `{ providedIn: 'root' }` services.
-    * **Impact:** Allows modern bundlers (Esbuild/Vite) to eliminate unused code paths (tree-shaking) effectively during production builds.
+        ### B. Tree-Shakable Services & Standalone Components
 
-    ---
+        * **Strategy:** Use `standalone: true` components and `{ providedIn: 'root' }` services.
+        * **Impact:** Allows modern bundlers (Esbuild/Vite) to eliminate unused code paths (tree-shaking) effectively during production builds.
 
-    ## 3. Build & Infrastructure Optimization
+        ---
 
-    ### A. Ahead-of-Time (AOT) & Esbuild/Vite Builders
+        ## 3. Build & Infrastructure Optimization
 
-    * **Strategy:** Ensure builds use the modern Angular Application Builder (`@angular-devkit/build-angular:application`), which uses Esbuild for fast, optimized production bundles and Vite for local development HMR.
+        ### A. Ahead-of-Time (AOT) & Esbuild/Vite Builders
 
-    ### B. Bundle Analysis
+        * **Strategy:** Ensure builds use the modern Angular Application Builder (`@angular-devkit/build-angular:application`), which uses Esbuild for fast, optimized production bundles and Vite for local development HMR.
 
-    * **Strategy:** Audit bundle composition regularly using tools like `webpack-bundle-analyzer` or native Esbuild build statistics (`ng build --stats-json`) to detect duplicate dependencies or oversized third-party libraries (e.g., swapping `lodash` or `moment.js` for lighter alternatives).
+        ### B. Bundle Analysis
 
-    ---
+        * **Strategy:** Audit bundle composition regularly using tools like `webpack-bundle-analyzer` or native Esbuild build statistics (`ng build --stats-json`) to detect duplicate dependencies or oversized third-party libraries (e.g., swapping `lodash` or `moment.js` for lighter alternatives).
 
-    > *"I approach Angular optimization across four pillars: **Runtime**, by leveraging Signals and Zoneless change detection to eliminate unneeded DOM re-renders; **Bundle Architecture**, using `@defer` blocks and lazy routes to minimize initial JS payload; **Build Tooling**, using the modern Esbuild application builder and dependency auditing; and **Network/Rendering**, using SSR non-destructive hydration and `NgOptimizedImage` to maximize Web Vitals like LCP and CLS."*
+        ---
 
-Q. Difference between Signals and BehaviorSubject. ### The key difference between a Signal and a BehaviorSubject comes down to fine-grained state management versus stream processing.
-A BehaviorSubject is an asynchronous RxJS push stream that requires subscription management and relies on change detection sweeps to update views.
-A Signal is a synchronous, fine-grained reactive value primitive that tracks template dependencies directly.
-In modern Angular, we use Signals as the primary mechanism for synchronous UI state because they provide glitch-free computed state and enable Zoneless rendering, while reserving RxJS for complex asynchronous operations like API search type-aheads or websocket streams.
+        > *"I approach Angular optimization across four pillars: **Runtime**, by leveraging Signals and Zoneless change detection to eliminate unneeded DOM re-renders; **Bundle Architecture**, using `@defer` blocks and lazy routes to minimize initial JS payload; **Build Tooling**, using the modern Esbuild application builder and dependency auditing; and **Network/Rendering**, using SSR non-destructive hydration and `NgOptimizedImage` to maximize Web Vitals like LCP and CLS."*
+
+Q. Difference between Signals and BehaviorSubject.
+
+    The key difference between a Signal and a BehaviorSubject comes down to fine-grained state management versus stream processing.
+    A BehaviorSubject is an asynchronous RxJS push stream that requires subscription management and relies on change detection sweeps to update views.
+    A Signal is a synchronous, fine-grained reactive value primitive that tracks template dependencies directly.
+    In modern Angular, we use Signals as the primary mechanism for synchronous UI state because they provide glitch-free computed state and enable Zoneless rendering, while reserving RxJS for complex asynchronous operations like API search type-aheads or websocket streams.
 
 Q. If I want to change CSS dynamically, how will you do it?
 
@@ -1256,6 +1261,7 @@ Q. What is the role of angular.json ?
 
 	---
 Q. What is JIT and AOT? Difference between them?
+
 	In Angular, **JIT (Just-In-Time)** and **AOT (Ahead-Of-Time)** are the two compilation modes used to convert Angular HTML templates and TypeScript code into executable JavaScript code that the browser can render.
 
 	---
@@ -1396,6 +1402,7 @@ Q.  Difference between @ViewChild and @ContentChild?
 	Use @ContentChild when working with elements passed in from outside via <ng-content> and access them inside ngAfterContentInit().
 
 Q.	What is Change Detection?
+
 	Change Detection is Angular’s mechanism for synchronizing internal component state with the DOM. Historically, Angular relied on Zone.js to patch asynchronous APIs and perform top-down tree checks whenever an async operation completed.
 	In modern Angular (v18+), Zone.js is dropped. CD is triggered explicitly by:
 		Signal writes (the framework knows which views depend on which signals)
@@ -1406,7 +1413,7 @@ Q.	What is Change Detection?
 
 Q. 	What are the ways Change Detection (CD) gets triggered in Angular?
 
-In Angular, CD execution depends on whether the app is running Zoned or Zoneless:
+    In Angular, CD execution depends on whether the app is running Zoned or Zoneless:
 
 	Zone.js Mode (Classic): Zone.js patches asynchronous browser APIs (setTimeout, Promise, HTTP events, DOM events). When an async operation completes, Zone.js notifies Angular to run a top-down ApplicationRef.tick() across the entire component tree.
 	Zoneless Mode (Modern - v18+): Without Zone.js, CD is scheduler-driven and explicit. It is triggered by:
@@ -1522,7 +1529,8 @@ Q. "The bundle size is 4 MB. Where do you start?"
 	Common Trap: Ensure lazy-loaded components aren't accidentally imported directly in app.config.ts or root modules, which pulls them back into the main bundle.
 
 Q.	Difference between Promise and Observable
-	Promises are eager, single-value, and non-cancellable constructs suited for basic asynchronous operations. Observables are lazy, multi-value, and cancellable stream.
+
+    Promises are eager, single-value, and non-cancellable constructs suited for basic asynchronous operations. Observables are lazy, multi-value, and cancellable stream.
 	In modern Angular, we push Observables to handle complex asynchronous operations (like debouncing or HTTP retries), but we bridge Observables to Signals at the component boundary using toSignal().
 
 Q.	How to add dynamic fields in Reactive Forms
@@ -1596,12 +1604,15 @@ Q. Demonstrate role-based routing (asked to wrote Pseudo code in notepad)
 	```
 
 Q.  How does Virtual Scroll improve performance
-	Virtual Scroll (typically implemented via Angular CDK's cdk-virtual-scroll-viewport) improves performance by rendering only the subset of items currently visible within the DOM viewport, plus a small buffer. Instead of instantiating thousands of DOM nodes for large dataset
+
+    Virtual Scroll (typically implemented via Angular CDK's cdk-virtual-scroll-viewport) improves performance by rendering only the subset of items currently visible within the DOM viewport, plus a small buffer. Instead of instantiating thousands of DOM nodes for large dataset
 
 Q. What is Deferred Loading?
 
 	"Introduced in Angular 17, Deferred Loading (@defer) is a template-level block that enables fine-grained code splitting and lazy loading of UI components, directives, and pipes directly inside the template. Unlike classic route-level lazy loading (which operates at the page level), @defer allows us to defer heavy UI elements—like complex charts, rich text editors, or below-the-fold comments—until specific triggers (like viewport visibility, user hover, or idle time) are met.""Introduced in Angular 17, Deferred Loading (@defer) is a template-level block that enables fine-grained code splitting and lazy loading of UI components, directives, and pipes directly inside the template. Unlike classic route-level lazy loading (which operates at the page level), @defer allows us to defer heavy UI elements—like complex charts, rich text editors, or below-the-fold comments—until specific triggers (like viewport visibility, user hover, or idle time) are met."
 
 Q. 	What are Dumb and Smart Components?
-	The Smart vs. Dumb component pattern (also known as Container vs. Presentational) is a fundamental architectural separation of concerns in frontend development. Smart components manage state, handle business/domain logic, and orchestrate asynchronous data calls. Dumb components are pure, stateless UI building blocks that accept data via inputs, render templates, and notify parents of user interactions via outputs or events."
+
+    The Smart vs. Dumb component pattern (also known as Container vs. Presentational) is a fundamental architectural separation of concerns in frontend development. Smart components manage state, handle business/domain logic, and orchestrate asynchronous data calls. Dumb components are pure, stateless UI building blocks that accept data via inputs, render templates, and notify parents of user interactions via outputs or events."
+
 ````

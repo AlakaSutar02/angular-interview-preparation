@@ -1,9 +1,4 @@
-# Angular Directives: Enterprise Architecture & Interview Preparation
-
-An in-depth guide to Angular directives, their architectural role, and senior-level patterns for building extensible, reusable UI behaviors.
-
----
-
+# Angular Directives
 ## 📌 Core Definition
 
 **A Directive is an instruction to the DOM.**

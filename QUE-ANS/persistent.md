@@ -1,7 +1,3 @@
-Here are clear, senior-level interview responses with code examples for each question:
-
----
-
 ### **1) Difference Between Block and Inline Elements**
 
 | Feature        | Block Elements                                                     | Inline Elements                                                                                  |
